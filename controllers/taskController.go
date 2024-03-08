@@ -3,6 +3,7 @@ package controllers
 import (
 	"golangprogram/initializers"
 	"golangprogram/models"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +15,16 @@ func CreateTask(c *gin.Context) {
 		Description string
 		Status      string
 	}
-	c.Bind(&ekle)
+
+	if err := c.Bind(&ekle); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Hatali istek"})
+		return
+	}
+
+	if len(ekle.Title) < 3 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Başlik 3 karakterden az olamaz"})
+		return
+	}
 
 	// create a post
 	task := models.Task{
@@ -26,7 +36,7 @@ func CreateTask(c *gin.Context) {
 	result := initializers.DB.Create(&task)
 
 	if result.Error != nil {
-		c.Status(400)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Görev oluşturulamadi"})
 		return
 	}
 

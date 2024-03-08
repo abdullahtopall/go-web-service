@@ -12,4 +12,6 @@ func init() {
 
 func main() {
 	initializers.DB.AutoMigrate(&models.Task{})
+	initializers.DB.AutoMigrate(&models.Worker{})
+	initializers.DB.AutoMigrate(&models.WorkerPool{})
 }
