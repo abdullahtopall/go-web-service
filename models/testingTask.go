@@ -139,7 +139,7 @@ func TestListTasks(t *testing.T) {
 		Title:       "Task 2",
 		Description: "Testing task listing",
 		Status:      "Completed",
-		Params:      map[string]string{"key": "value2"},
+		Params:      map[string]string{"key": "value22"},
 	}
 	db.Create(&task1)
 	db.Create(&task2)
