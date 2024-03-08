@@ -3,6 +3,7 @@ package main
 import (
 	"golangprogram/controllers"
 	"golangprogram/initializers"
+	"golangprogram/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,6 +14,20 @@ func init() {
 }
 
 func main() {
+
+	workerCount := 5 // İstediğiniz kadar iş parçacığı sayısı
+	workerPool := models.WorkerPool{
+		Workers:    make([]*models.Worker, workerCount),
+		TaskQueue:  make(chan models.Task, 100), // Puffer boyutunu ihtiyaca göre ayarlayın
+		QuitSignal: make(chan bool),
+	}
+
+	for i := 0; i < workerCount; i++ {
+		workerPool.Workers[i] = &models.Worker{TaskCh: make(chan models.Task)}
+	}
+
+	workerPool.Start()
+
 	r := gin.Default()
 	r.POST("/task", controllers.CreateTask)
 	r.GET("/tasks", controllers.ListTasks)

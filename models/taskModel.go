@@ -7,4 +7,5 @@ type Task struct {
 	Title       string
 	Description string
 	Status      string
+	Params      map[string]string
 }
