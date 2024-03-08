@@ -4,9 +4,29 @@ import (
 	"golangprogram/controllers"
 	"golangprogram/initializers"
 	"golangprogram/models"
+	"net/http"
+
+	swaggerFiles "github.com/swaggo/files"
 
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/example/basic/docs"
 )
+
+// @BasePath /api/v1
+
+// PingExample godoc
+// @Summary ping example
+// @Schemes
+// @Description do ping
+// @Tags example
+// @Accept json
+// @Produce json
+// @Success 200 {string} Helloworld
+// @Router /example/helloworld [get]
+func Helloworld(g *gin.Context) {
+	g.JSON(http.StatusOK, "helloworld")
+}
 
 func init() {
 	initializers.LoadEnvVariables()
@@ -14,6 +34,18 @@ func init() {
 }
 
 func main() {
+
+	r := gin.Default()
+	docs.SwaggerInfo_swagger.BasePath = "/api/v1"
+	v1 := r.Group("/api/v1")
+	{
+		eg := v1.Group("/example")
+		{
+			eg.GET("/helloworld", Helloworld)
+		}
+	}
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// r.Run(":8080")
 
 	workerCount := 5 // İstediğiniz kadar iş parçacığı sayısı
 	workerPool := models.WorkerPool{
@@ -28,7 +60,7 @@ func main() {
 
 	workerPool.Start()
 
-	r := gin.Default()
+	// r := gin.Default()
 	r.POST("/task", controllers.CreateTask)
 	r.GET("/tasks", controllers.ListTasks)
 	r.GET("/task/:id", controllers.GetTask)
