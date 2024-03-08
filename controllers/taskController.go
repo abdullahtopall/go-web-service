@@ -62,7 +62,12 @@ func GetTask(c *gin.Context) {
 	id := c.Param("id")
 
 	var task models.Task
-	initializers.DB.First(&task, id)
+	result := initializers.DB.Where("id = ?", id).First(&task)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Görev bulunamadi"})
+		return
+	}
 
 	c.JSON(200, gin.H{
 		"task": task,
@@ -83,14 +88,23 @@ func UpdateTask(c *gin.Context) {
 
 	//find the post were updating
 	var task models.Task
-	initializers.DB.First(&task, id)
+	result := initializers.DB.First(&task, id)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Görev bulunamadı"})
+		return
+	}
 
 	//update it
-	initializers.DB.Model(&task).Updates(models.Task{
+	result = initializers.DB.Model(&task).Updates(models.Task{
 		Title:       ekle.Title,
 		Description: ekle.Description,
 		Status:      ekle.Status,
 	})
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Görev güncellenemedi"})
+		return
+	}
 
 	//respond with it
 	c.JSON(200, gin.H{
