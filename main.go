@@ -5,7 +5,10 @@ import (
 	"golangprogram/initializers"
 	"golangprogram/models"
 	"net/http"
+	"net/http/httptest"
+	"testing"
 
+	"github.com/go-playground/assert/v2"
 	swaggerFiles "github.com/swaggo/files"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +27,7 @@ import (
 // @Produce json
 // @Success 200 {string} Helloworld
 // @Router /example/helloworld [get]
+
 func Helloworld(g *gin.Context) {
 	g.JSON(http.StatusOK, "helloworld")
 }
@@ -68,4 +72,28 @@ func main() {
 	r.DELETE("/task/:id", controllers.DeleteTask)
 
 	r.Run() // listen and serve on 0.0.0.0:8080
+}
+
+func TestHelloworld(t *testing.T) {
+	router := gin.Default()
+
+	router.GET("/helloworld", Helloworld)
+
+	req, err := http.NewRequest("GET", "/helloworld", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+
+	context, _ := gin.CreateTestContext(rr)
+
+	context.Request = req
+
+	Helloworld(context)
+
+	assert.Equal(t, http.StatusOK, rr.Code)
+
+	expected := "\"helloworld\"\n"
+	assert.Equal(t, expected, rr.Body.String())
 }
