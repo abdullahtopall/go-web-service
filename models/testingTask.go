@@ -105,7 +105,6 @@ func TestDeleteTask(t *testing.T) {
 }
 
 func TestGetTask(t *testing.T) {
-	// Bir görev oluştur
 	taskToGet := Task{
 		Title:       "Task to Get",
 		Description: "Testing task retrieval",
@@ -114,14 +113,12 @@ func TestGetTask(t *testing.T) {
 	}
 	db.Create(&taskToGet)
 
-	// Görevi veritabanından al
 	var retrievedTask Task
 	db.First(&retrievedTask, taskToGet.ID)
 	db.First(&retrievedTask, taskToGet.Title)
 	db.First(&retrievedTask, taskToGet.Description)
 	db.First(&retrievedTask, taskToGet.Status)
 
-	// Görevin doğru bir şekilde alındığını kontrol et
 	assert.Equal(t, taskToGet.ID, retrievedTask.ID)
 	assert.Equal(t, taskToGet.Title, retrievedTask.Title)
 	assert.Equal(t, taskToGet.Description, retrievedTask.Description)

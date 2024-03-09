@@ -51,10 +51,10 @@ func main() {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// r.Run(":8080")
 
-	workerCount := 5 // İstediğiniz kadar iş parçacığı sayısı
+	workerCount := 5
 	workerPool := models.WorkerPool{
 		Workers:    make([]*models.Worker, workerCount),
-		TaskQueue:  make(chan models.Task, 100), // Puffer boyutunu ihtiyaca göre ayarlayın
+		TaskQueue:  make(chan models.Task, 100),
 		QuitSignal: make(chan bool),
 	}
 
@@ -64,7 +64,6 @@ func main() {
 
 	workerPool.Start()
 
-	// r := gin.Default()
 	r.POST("/task", controllers.CreateTask)
 	r.GET("/tasks", controllers.ListTasks)
 	r.GET("/task/:id", controllers.GetTask)

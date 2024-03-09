@@ -9,28 +9,26 @@ import (
 )
 
 func CreateTask(c *gin.Context) {
-	// get data off req body
-	var ekle struct {
+	var updateBody struct {
 		Title       string
 		Description string
 		Status      string
 	}
 
-	if err := c.Bind(&ekle); err != nil {
+	if err := c.Bind(&updateBody); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Hatali istek"})
 		return
 	}
 
-	if len(ekle.Title) < 3 {
+	if len(updateBody.Title) < 3 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Başlik 3 karakterden az olamaz"})
 		return
 	}
 
-	// create a post
 	task := models.Task{
-		Title:       ekle.Title,
-		Description: ekle.Description,
-		Status:      ekle.Status,
+		Title:       updateBody.Title,
+		Description: updateBody.Description,
+		Status:      updateBody.Status,
 	}
 
 	result := initializers.DB.Create(&task)
@@ -40,25 +38,21 @@ func CreateTask(c *gin.Context) {
 		return
 	}
 
-	// return it
 	c.JSON(200, gin.H{
 		"task": task,
 	})
 }
 
 func ListTasks(c *gin.Context) {
-	//Get the posts
 	var tasks []models.Task
 	initializers.DB.Find(&tasks)
 
-	//Respons with them
 	c.JSON(200, gin.H{
 		"tasks": tasks,
 	})
 }
 
 func GetTask(c *gin.Context) {
-	// get it off url
 	id := c.Param("id")
 
 	var task models.Task
@@ -75,18 +69,15 @@ func GetTask(c *gin.Context) {
 }
 
 func UpdateTask(c *gin.Context) {
-	// get the id off the url
 	id := c.Param("id")
 
-	// get the data off req body
-	var ekle struct {
+	var updateBody struct {
 		Title       string
 		Description string
 		Status      string
 	}
-	c.Bind(&ekle)
+	c.Bind(&updateBody)
 
-	//find the post were updating
 	var task models.Task
 	result := initializers.DB.First(&task, id)
 	if result.Error != nil {
@@ -94,11 +85,10 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
-	//update it
 	result = initializers.DB.Model(&task).Updates(models.Task{
-		Title:       ekle.Title,
-		Description: ekle.Description,
-		Status:      ekle.Status,
+		Title:       updateBody.Title,
+		Description: updateBody.Description,
+		Status:      updateBody.Status,
 	})
 
 	if result.Error != nil {
@@ -106,7 +96,6 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
-	//respond with it
 	c.JSON(200, gin.H{
 		"newTask": task,
 	})
