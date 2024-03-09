@@ -9,7 +9,9 @@ import (
 
 type Worker struct {
 	gorm.Model
-	TaskCh chan Task
+	Email    string `gorm:"unique"`
+	Password string
+	TaskCh   chan Task
 }
 
 func (w *Worker) Start(taskQueue chan Task, wg *sync.WaitGroup, quitSignal chan bool) {

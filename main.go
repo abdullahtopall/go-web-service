@@ -3,6 +3,7 @@ package main
 import (
 	"golangprogram/controllers"
 	"golangprogram/initializers"
+	"golangprogram/middleware"
 	"golangprogram/models"
 	"net/http"
 	"net/http/httptest"
@@ -16,18 +17,6 @@ import (
 	"github.com/swaggo/gin-swagger/example/basic/docs"
 )
 
-// @BasePath /api/v1
-
-// PingExample godoc
-// @Summary ping example
-// @Schemes
-// @Description do ping
-// @Tags example
-// @Accept json
-// @Produce json
-// @Success 200 {string} Helloworld
-// @Router /example/helloworld [get]
-
 func Helloworld(g *gin.Context) {
 	g.JSON(http.StatusOK, "helloworld")
 }
@@ -35,6 +24,7 @@ func Helloworld(g *gin.Context) {
 func init() {
 	initializers.LoadEnvVariables()
 	initializers.ConnectToDb()
+	initializers.SyncDatabase()
 }
 
 func main() {
@@ -49,7 +39,6 @@ func main() {
 		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	// r.Run(":8080")
 
 	workerCount := 5
 	workerPool := models.WorkerPool{
@@ -70,7 +59,11 @@ func main() {
 	r.PUT("/task/:id", controllers.UpdateTask)
 	r.DELETE("/task/:id", controllers.DeleteTask)
 
-	r.Run() // listen and serve on 0.0.0.0:8080
+	r.POST("/signup", controllers.Signup)
+	r.POST("/login", controllers.Login)
+	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
+
+	r.Run()
 }
 
 func TestHelloworld(t *testing.T) {
