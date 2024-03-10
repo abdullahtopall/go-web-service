@@ -16,12 +16,12 @@ func CreateTask(c *gin.Context) {
 	}
 
 	if err := c.Bind(&updateBody); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Hatali istek"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
 		return
 	}
 
 	if len(updateBody.Title) < 3 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Başlik 3 karakterden az olamaz"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Title cannot be less than 3 characters"})
 		return
 	}
 
@@ -34,7 +34,7 @@ func CreateTask(c *gin.Context) {
 	result := initializers.DB.Create(&task)
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Görev oluşturulamadi"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Task could not be created"})
 		return
 	}
 
@@ -59,7 +59,7 @@ func GetTask(c *gin.Context) {
 	result := initializers.DB.Where("id = ?", id).First(&task)
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Görev bulunamadi"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Task not found"})
 		return
 	}
 
@@ -81,7 +81,7 @@ func UpdateTask(c *gin.Context) {
 	var task models.Task
 	result := initializers.DB.First(&task, id)
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Görev bulunamadı"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Task not found"})
 		return
 	}
 
@@ -92,7 +92,7 @@ func UpdateTask(c *gin.Context) {
 	})
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Görev güncellenemedi"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Task could not be updated"})
 		return
 	}
 
